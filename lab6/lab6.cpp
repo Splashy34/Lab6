@@ -23,6 +23,32 @@ private:
 		clearnode(node->right);
 		delete node;
 	}
+
+	Node* deleteByMerging(Node*& node) 
+	{
+		Node* temp = node;
+		if (node != nullptr) {
+			if (!node->right) {
+				node = node->left;
+			}
+			else if (node->left == nullptr) {
+				node = node->right;
+			}
+			else  {
+				temp = node->left;
+				while (temp->right != nullptr) {
+					temp = temp->right;
+				}
+				temp->right = node->right;
+				temp = node;
+				node = node->left;
+			}
+			delete temp;
+			size--;
+			return node;
+		}
+	}
+
 public:
 	Tree();
 	~Tree();
@@ -81,61 +107,28 @@ void Tree::add(int data)
 
 void Tree::remove(int data)
 {
-	Node* current = root;
-	Node* parent = nullptr;
-	while (current != nullptr && current->data != data)
-	{
-		parent = current;
-		if (data < current->data)
-		{
-			current = current->left;
+	Node* node = root, * prev = 0;
+	while (node != nullptr) {
+		if (node->data == data) break;
+		prev = node;
+		if (data < node->data) {
+			node = node->left;
 		}
-		else
-		{
-			current = current->right;
+		else {
+			node = node->right;
 		}
 	}
-	if (current == nullptr) return;
-	
-	if (current->left == nullptr || current->right == nullptr)
-	{
-		Node* newChild = (current->left != nullptr) ? current->left : current->right;
-		if (parent == nullptr)
-		{
-			root = newChild;
+	if (node != nullptr && node->data == data) {
+		if (node == root) {
+			root = deleteByMerging(root);
 		}
-		else if (parent->left == current)
-		{
-			parent->left = newChild;
+		else if (prev->left == node) {
+			prev->left = deleteByMerging(prev->left);
 		}
-		else
-		{
-			parent->right = newChild;
+		else {
+			prev->right = deleteByMerging(prev->right);
 		}
 	}
-
-	else
-	{
-		Node* validSub = current->right;
-		Node* validSubParent = current;
-		while (validSub->left != nullptr)
-		{
-			validSubParent = validSub;
-			validSub = validSub->left;
-		}
-		current->data = validSub->data;
-		if (validSubParent == current)
-		{
-			validSubParent->right = validSub->right;
-		}
-		else
-		{
-			validSubParent->left = validSub->right;
-		}
-		current = validSub;
-	}
-	size--;
-	delete current;
 }
 
 bool Tree::contains(int data)
@@ -197,7 +190,6 @@ int main()
 			cout << "Enter the element to remove: " << endl;
 			cin >> value;
 			tree.remove(value);
-			cout << "The element is removed. " << endl;
 			break;
 		case 3:
 			cout << "Enter the element to check: " << endl;
