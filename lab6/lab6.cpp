@@ -24,30 +24,25 @@ private:
 		delete node;
 	}
 
-	Node* deleteByMerging(Node*& node) 
-	{
-		Node* temp = node;
+	Node* deleteByMerging(Node*& node) {
+		Node* tmp = node;
 		if (node != nullptr) {
-			if (!node->right) {
+			if (!node->right) node = node->left;
+			else if (node->left == nullptr) node = node->right;
+			else {
+				tmp = node->left;
+				while (tmp->right != nullptr) tmp = tmp->right;
+				tmp->right = node->right;
+				tmp = node;
 				node = node->left;
 			}
-			else if (node->left == nullptr) {
-				node = node->right;
-			}
-			else  {
-				temp = node->left;
-				while (temp->right != nullptr) {
-					temp = temp->right;
-				}
-				temp->right = node->right;
-				temp = node;
-				node = node->left;
-			}
-			delete temp;
+			delete tmp;
 			size--;
 			return node;
 		}
 	}
+
+
 
 public:
 	Tree();
@@ -72,6 +67,10 @@ Tree::~Tree()
 
 void Tree::add(int data)
 {
+	if (contains(data))
+	{
+		return;
+	}
 	Node* newnode = new Node(data);
 	if (root == nullptr)
 	{
@@ -105,29 +104,23 @@ void Tree::add(int data)
 	size++;
 }
 
-void Tree::remove(int data)
-{
+void Tree:: remove(int value) {
 	Node* node = root, * prev = 0;
 	while (node != nullptr) {
-		if (node->data == data) break;
+		if (node->data == value)
+			break;
 		prev = node;
-		if (data < node->data) {
+		if (value < node->data)
 			node = node->left;
-		}
-		else {
-			node = node->right;
-		}
+		else node = node->right;
 	}
-	if (node != nullptr && node->data == data) {
-		if (node == root) {
+	if (node != nullptr && node->data == value) {
+		if (node == root)
 			root = deleteByMerging(root);
-		}
-		else if (prev->left == node) {
+		else if (prev->left == node)
 			prev->left = deleteByMerging(prev->left);
-		}
-		else {
+		else
 			prev->right = deleteByMerging(prev->right);
-		}
 	}
 }
 
@@ -184,7 +177,6 @@ int main()
 			cout << "Enter the element you want to add: " << endl;
 			cin >> value;
 			tree.add(value);
-			cout << "The element is added. " << endl;
 			break;
 		case 2:
 			cout << "Enter the element to remove: " << endl;
