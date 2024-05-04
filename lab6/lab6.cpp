@@ -104,17 +104,17 @@ void Tree::add(int data)
 	size++;
 }
 
-void Tree:: remove(int value) {
+void Tree:: remove(int data) {
 	Node* node = root, * prev = 0;
 	while (node != nullptr) {
-		if (node->data == value)
+		if (node->data == data)
 			break;
 		prev = node;
-		if (value < node->data)
+		if (data < node->data)
 			node = node->left;
 		else node = node->right;
 	}
-	if (node != nullptr && node->data == value) {
+	if (node != nullptr && node->data == data) {
 		if (node == root)
 			root = deleteByMerging(root);
 		else if (prev->left == node)
